@@ -9,7 +9,7 @@
 
 Assume that you're going to install [Argocd](https://argo-cd.readthedocs.io/en/stable/) with [Helm](https://helm.sh/). You may need to override the default values of the ArgoCD chart. For example,
 
-```yaml
+```yml
 # values.yaml
 global:
   image:
@@ -17,9 +17,16 @@ global:
     tag: '1.0.0' # Recheck the latest tag
 ```
 
+After that, install the ArgoCD with the following command.
+
+```yml
+helm repo add argo https://argoproj.github.io/argo-helm
+helm install argocd argo/argo-cd -f values.yaml
+```
+
 Then, add the ArgoCD ConfigManagementPlugin after the ArgoCD installation.
 
-```yaml
+```yml
 # plugin.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: ConfigManagementPlugin

@@ -9,8 +9,14 @@ RUN apt-get update
 RUN apt-get install -y curl
 
 # Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_20.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
+
+# Install yarn
+RUN npm install -g yarn
+
+# install pnpm
+RUN curl -fsSL https://get.pnpm.io/install.sh | bash -
 
 # Install sops
 RUN curl -LO https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64 \
@@ -29,4 +35,4 @@ RUN apt-get install -y jq
 RUN npm install -g typescript cdk8s-cli
 
 # Switch back to non-root user
-USER argocd
+USER 999
