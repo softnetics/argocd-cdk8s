@@ -35,8 +35,10 @@ RUN apt-get install -y jq
 RUN npm install -g typescript cdk8s-cli
 
 # Setup non-root user
-RUN groupadd --gid 999 appuser \
-    && useradd --uid 999 --gid appuser --shell /bin/bash --create-home appuser
+RUN groupadd --gid 999 argocd \
+    && useradd --uid 999 --gid argocd --shell /bin/bash --create-home argocd
+
+WORKDIR /home/argocd
 
 # Switch back to non-root user
 USER 999
