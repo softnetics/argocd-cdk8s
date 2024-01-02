@@ -1,4 +1,4 @@
-FROM quay.io/argoproj/argocd:v2.9.3
+FROM google/cloud-sdk:458.0.1-slim
 
 # Switch to root for the ability to perform install
 USER root
@@ -33,6 +33,10 @@ RUN apt-get install -y jq
 
 # Install typescript and cdk8s-cli to make it easier to generate k8s manifests
 RUN npm install -g typescript cdk8s-cli
+
+# Setup non-root user
+RUN groupadd --gid 999 appuser \
+    && useradd --uid 999 --gid appuser --shell /bin/bash --create-home appuser
 
 # Switch back to non-root user
 USER 999
