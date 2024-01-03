@@ -1,9 +1,12 @@
-FROM google/cloud-sdk:458.0.1-slim
+FROM quay.io/argoproj/argocd:v2.9.3
 
 # Switch to root for the ability to perform install
 USER root
 
 RUN apt-get update
+
+# Setup non-root user
+WORKDIR /home/argocd
 
 # Install curl to download tools
 RUN apt-get install -y curl
@@ -12,11 +15,8 @@ RUN apt-get install -y curl
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
-# Install yarn
-RUN npm install -g yarn
-
-# install pnpm
-RUN curl -fsSL https://get.pnpm.io/install.sh | bash -
+# Install yarn and pnpm
+RUN npm install -g yarn pnpm
 
 # Install sops
 RUN curl -LO https://github.com/getsops/sops/releases/download/v3.8.1/sops-v3.8.1.linux.amd64 \
@@ -31,14 +31,15 @@ RUN curl -LO https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_
 # Install jq
 RUN apt-get install -y jq
 
-# Install typescript and cdk8s-cli to make it easier to generate k8s manifests
-RUN npm install -g typescript cdk8s-cli
+# Install kubectl
+RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+RUN echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+RUN apt-get update
+RUN apt-get install -y kubectl
 
-# Setup non-root user
-RUN groupadd --gid 999 argocd \
-    && useradd --uid 999 --gid argocd --shell /bin/bash --create-home argocd
-
-WORKDIR /home/argocd
+# Grant permissions to argocd user in ~/.config
+RUN mkdir -p /home/argocd/.config
+RUN chown -R argocd:argocd /home/argocd/.config
 
 # Switch back to non-root user
 USER 999
